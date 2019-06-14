@@ -1,6 +1,6 @@
 package com.lambdaschool.safezoos.service;
 
-import com.lambdaschool.authenticatedusers.models.User;
+import com.lambdaschool.safezoos.model.User;
 
 import java.util.List;
 

@@ -1,9 +1,9 @@
 package com.lambdaschool.safezoos.service;
 
-import com.lambdaschool.authenticatedusers.models.User;
-import com.lambdaschool.authenticatedusers.models.UserRoles;
-import com.lambdaschool.authenticatedusers.repository.RoleRepository;
-import com.lambdaschool.authenticatedusers.repository.UserRepository;
+import com.lambdaschool.safezoos.model.User;
+import com.lambdaschool.safezoos.model.UserRoles;
+import com.lambdaschool.safezoos.repository.RoleRepository;
+import com.lambdaschool.safezoos.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
