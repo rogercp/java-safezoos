@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -22,7 +23,7 @@ public class ZooController
     @Autowired
     private ZooService zooService;
 
-
+    @PreAuthorize("hasAuthority('ROLE_ZOODATA')")
     @GetMapping(value="/zoos",produces = {"application/json"})
     public ResponseEntity<?>listAllZoos()
     {
@@ -30,37 +31,28 @@ public class ZooController
         return new ResponseEntity<>(myZoos, HttpStatus.OK);
     }
 
-    @DeleteMapping(" /admin/zoos/{id}")
-    public ResponseEntity<?> deleteZooById(@PathVariable long id)
+
+    @PreAuthorize("hasAuthority('ROLE_ZOODATA')")
+    @GetMapping(value = "/zoos/{id}", produces = {"application/json"})
+    public ResponseEntity<?> findZooById(@PathVariable long id)
     {
-        zooService.delete(id);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    @PostMapping(value="/admin/zoos",
-            consumes = {"application/json"},
-            produces="application/json")
-    public ResponseEntity<?> addNewZoo(@Valid @RequestBody Zoo newZoo)
-    {
-        newZoo=zooService.save(newZoo);
-
-        HttpHeaders responseHeader= new HttpHeaders();
-
-        URI newZooURI= ServletUriComponentsBuilder.fromCurrentRequest().path("/{zooid}").buildAndExpand(newZoo.getZooid()).toUri();
-        responseHeader.setLocation(newZooURI);
-
-        return new ResponseEntity<>(null,responseHeader,HttpStatus.OK);
+        Zoo z = zooService.findZooById(id);
+        return new ResponseEntity<>(z, HttpStatus.OK);
     }
 
 
-    @PutMapping(value="/admin/zoos/{zooid}",
-            consumes={"application/json"})
-    public ResponseEntity<?> updateZoo(@RequestBody Zoo updateZoo, @PathVariable long zooid)
+    @PreAuthorize("hasAuthority('ROLE_ZOODATA')")
+    @GetMapping(value = "/{name}", produces = {"application/json"})
+    public ResponseEntity<?> findZooByName(@PathVariable String name)
     {
-        zooService.update(updateZoo,zooid);
-        return new ResponseEntity<>(HttpStatus.OK);
+        Zoo z = zooService.findZooByName(name);
+        return new ResponseEntity<>(z, HttpStatus.OK);
     }
 
+
+
+
+    
 
 }
 

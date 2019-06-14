@@ -41,6 +41,26 @@ public class ZooServiceImpl implements ZooService
         }
     }
 
+    @Override
+    public Zoo findZooById(long id)
+    {
+        return zoorepos.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Long.toString(id)));
+    }
+
+
+    @Override
+    public Zoo findZooByName(String name) throws EntityNotFoundException
+    {
+        Zoo zoo = zoorepos.findByZooname(name);
+
+        if (zoo == null)
+        {
+            throw new EntityNotFoundException("Zoo " + name + " not found!");
+        }
+        return zoo;
+    }
+
     @Transactional
     @Override
     public  Zoo save(Zoo zoo)
@@ -73,6 +93,10 @@ public class ZooServiceImpl implements ZooService
         }
         return zoorepos.save(currentZoo);
     }
+
+
+
+
 
 }
 

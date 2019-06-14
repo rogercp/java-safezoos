@@ -1,87 +1,73 @@
-package com.lambdaschool.safezoos.controllers;
+package com.lambdaschool.safezoos.controller;
 
-import com.lambdaschool.safezoos.model.User;
-import com.lambdaschool.safezoos.service.UserService;
+import com.lambdaschool.safezoos.model.Zoo;
+import com.lambdaschool.safezoos.service.ZooService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
 
 @RestController
-@RequestMapping("admin")
+@RequestMapping("/admin")
 public class AdminController
 {
-
     @Autowired
-    private UserService userService;
-
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @GetMapping(value = "/users", produces = {"application/json"})
-    public ResponseEntity<?> listAllUsers()
-    {
-        List<User> myUsers = userService.findAll();
-        return new ResponseEntity<>(myUsers, HttpStatus.OK);
-    }
+    ZooService zooService;
 
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @GetMapping(value = "/user/{userId}", produces = {"application/json"})
-    public ResponseEntity<?> getUser(@PathVariable Long userId)
+    @PutMapping(value = "/zoos/{id}",
+            produces = {"application/json"},
+            consumes = {"application/json"})
+    public ResponseEntity<?> updateZoo(
+            @RequestBody
+                    Zoo updateZoo,
+            @PathVariable
+                    long id)
     {
-        User u = userService.findUserById(userId);
-        return new ResponseEntity<>(u, HttpStatus.OK);
+        zooService.update(updateZoo, id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
-
-
-    @GetMapping(value = "/getusername", produces = {"application/json"})
-    @ResponseBody
-    public ResponseEntity<?> getCurrentUserName(Authentication authentication)
-    {
-        return new ResponseEntity<>(authentication.getPrincipal(), HttpStatus.OK);
-    }
-
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @PostMapping(value = "/user", consumes = {"application/json"}, produces = {"application/json"})
-    public ResponseEntity<?> addNewUser(@Valid @RequestBody User newuser) throws URISyntaxException
+    @PostMapping(value = "/zoos",
+            consumes = {"application/json"},
+            produces = {"application/json"})
+    public ResponseEntity<?> addNewZoo(HttpServletRequest request, @Valid
+    @RequestBody
+            Zoo newZoo) throws URISyntaxException
     {
-        newuser =  userService.save(newuser);
+        newZoo = zooService.save(newZoo);
 
         // set the location header for the newly created resource
         HttpHeaders responseHeaders = new HttpHeaders();
-        URI newUserURI = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{userid}")
-                .buildAndExpand(newuser.getUserid())
-                .toUri();
-        responseHeaders.setLocation(newUserURI);
+        // URI newRestaurantURI = ServletUriComponentsBuilder.fromCurrentRequest().path("/{zooid}").buildAndExpand(newZoo.getZooid()).toUri();
+        URI newRestaurantURI = ServletUriComponentsBuilder.fromUriString(request.getServerName() + ":" + request.getLocalPort() + "/zoos/zoos/{zooid}").buildAndExpand(newZoo.getZooid()).toUri();
+        responseHeaders.setLocation(newRestaurantURI);
 
         return new ResponseEntity<>(null, responseHeaders, HttpStatus.CREATED);
     }
 
 
-    @PutMapping(value = "/user/{id}")
-    public ResponseEntity<?> updateUser(@RequestBody User updateUser, @PathVariable long id)
-    {
-        userService.update(updateUser, id);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @DeleteMapping("/user/{id}")
-    public ResponseEntity<?> deleteUserById(@PathVariable long id)
+    @DeleteMapping(value = "/zoos/{zooid}")
+    public ResponseEntity<?> deleteZooById(
+            @PathVariable
+                    long zooid)
     {
-        userService.delete(id);
+        zooService.delete(zooid);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
 }
+
+
+
